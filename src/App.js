@@ -16,12 +16,12 @@ function App() {
     <BrowserRouter>
 
     <Navbar/>
-   
+   <div className="container">
     <Routes>
     <Route  excat path="/" element={<Home></Home>}/>
     <Route excat path="/About" element ={<About></About>}/>
     </Routes>
-    
+    </div>
     </BrowserRouter>  
     </NoteState>
     </>   
@@ -29,3 +29,4 @@ function App() {
 }
 
 export default App;
+ 
