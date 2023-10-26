@@ -1,125 +1,98 @@
-const express = require('express')
-const router = express.Router()
-const { body, validationResult } = require('express-validator');
-const fetchuser = require('../middleware/fetchuserdetails'); //it is middleware function use to authenticate the logged in user
+const express = require('express');
+const fetchuser = require('../middleware/fetchuser');
+const router = express.Router();
 const Notes = require('../models/Notes');
-const { closeSync } = require('fs');
+const {body,validationResult} = require('express-validator');
 
-
-// Routes 1: get all the notes using : Get : "api/notes/fetchallnotes" : user login required
-router.get('/fetchallnotes',fetchuser,async(req,res)=>{
-    const errors = validationResult('req');
-    if(!errors.isEmpty()){
-        return res.status(400).json({error:errors.array()})  
-     }
-     try {
-        const notes = await Notes.find({user: req.user}); 
-    console.log("Fetched Notes:", notes); // Log the fetched notes
-    res.json(notes);
-     } catch (error) {
-        console.error(error.message);
-        return res.status(500).send('internal Server Error' + error.stack);
+// router1 : get alll the user data : get : 'api/notes/getuserdata'
+router.get('/getuserdata',fetchuser,async(req,res)=>{
+    try {
+    const note = await Notes.find({user:req.user});
+    console.log(note);
+    res.json(note);
+    } catch (error) {
+        console.log(error.stack);
+        return res.status(400).json(error.message)
     }
     
 })
 
 
-
-// Rotuter 2: get the Add all the notes using: post : "/api/notes/addnote" : user login required
+//router 2 : add  the user's note:post : '/api/notes/addnote'
 router.post('/addnote',fetchuser,[
-   body('title','enter more then 5 character').isLength({min:5}),
-   body('description','enter more then 5 character').isLength({min:5})
-
+    body('title','please enter the valid title').isLength({min:5}),
+    body('description','please enter the valid description').isLength({min:5})
 ],async(req,res)=>{
-
+    const errors = validationResult(req)
+    if(!errors.isEmpty()){
+        return res.status(400).json(errors.array());
+    }
     try {
-        const {title, tag, description} = req.body // destructuring
-        const errors = validationResult(req); // Correct
-        if (!errors.isEmpty()) {
-          return res.status(400).json({errors:errors.array()});
-        }
-        console.log(req.user)
-        const savenotes = await new Notes({
-            title,
-            tag,
-            description, 
-            user: req.user
-        });
-        console.log(savenotes.title)
-        const sasve = await savenotes.save();
-        res.json(sasve);
+      const {title,description,tag}= req.body
+      const note = await new Notes({
+        title,description,tag,user:req.user
+      });
+      const savednote = await note.save();
+      res.json(savednote);
     } catch (error) {
-        return res.status(500).send('Server Error'+ error.stack);
+        return res.status(400).json(error.message);
+    }
+      
+});
+
+// Router 3 : update an existing note : put :'api/notes/updatenote': login require ..
+router.put('/updatenote/:id',fetchuser,async(req,res)=>{
+   try {
+    // get fetch the data using the note id..
+    const   note =await Notes.findById(req.params.id);
+    
+    // check the note is exist or not ...
+    if(!note){
+        return res.status(404).send('not Found');
+    }
+    
+    // checck wheater the user is authorize to update to note or not.
+    if(note.user.toString() !== req.user){
+        return res.send(401).send('access Deny');
     }
    
-
-})
-
-// Rotute3 used to update the particular note: put :"/api/notes/updatenote":user login required
-// for updation  alway use the Put request 
-router.put('/updatenote/:id',fetchuser, async(req,res)=>{
-    const {title,tag,description}=req.body; // get all value from request body.
+    //else update the user's note..
+    const {title,tag,description} = req.body;
+    const newnote = {} //-> oject
+    if(title){newnote.title = title};
+    if(tag){newnote.tag = tag};
+    if(description){newnote.description = description};
     
-     
+    let updatenote = await Notes.findByIdAndUpdate(req.params.id,{$set:newnote},{new:true})
+    res.send(updatenote);
 
-    try {
-      // create a new note object ...
-     const newnote ={};
-     if(title){newnote.title = title};
-     if(tag){newnote.tag = tag};
-     if(description){newnote.description = description};
-    
-     // check the note is exist or not & find the note that need to be updated..  
-     let notes = await Notes.findById(req.params.id); 
-     if(!notes){
-         return res.status(404).send('note not found');
-     }
-     
-     // check whether the note being updated belongs to the currently authenticated user or not
-     if(notes.user.toString() !== req.user){ //req.user -> it contains the current user's id & the req body come from fetchuser middle ware that authenticate the user  
-         return res.status(401).send('acess denied');
-     }
-     //here the note is update...
-     notes= await Notes.findByIdAndUpdate(req.params.id,{$set: newnote},{new:true});
-      //findByIdAndUpdate: This is a Mongoose method used to find a document by its unique _id field and update it in a single operation. It takes three main arguments:
- 
-      // req.params.id: This is the value of the id parameter from the URL. It's the unique identifier of the note you want to update.
- 
-      // {$set: newnote}: This is the update object. It uses the $set operator to update specific fields in the document. newnote is the object containing the updated values for the fields like title, tag, and description.
- 
-      // { new: true }: This option tells Mongoose to return the updated document as the result of the operation. Without this option, the default behavior is to return the document as it was before the update.
-      res.json(notes);
-
-    } catch (error){
-       return res.status(500).send("internal server error:"+ error.stack);   
-    }      
-})
+   } catch (error) {
+    res.status(400).json("internal server issue: "+error.stack);
+   }
 
 
-//Route 4: used to delete an existing note : delete : "/api/notes/deletenote" : user login required.
+});
+
+// rotue3 : delete an existing note : delete : 'api/notes/deletenote': user login required.
 router.delete('/deletenote/:id',fetchuser,async(req,res)=>{
-    
     try {
-        //find the the note is exist or not ...
-        const note = await Notes.findById(req.params.id);
-    
-        if(!note){
-            return res.status(404).send("page note found");
-        }
+        // check note exist or not 
+    const note = await Notes.findById(req.params.id);
+    if(!note){
+        return res.status(404).send('page not found');
+    }
+    // check wheater note being deleted belongs to currently authenticate user or not..
+    if(note.user.toString() !== req.user){
+        return res.status(401).send('access  denied');
+    }
 
-        // check wheater note being deleted belongs to the currently authenticate user or not.
-        if(note.user.toString() !== req.user){// req.user -> from fetchuser that store the current user's id 
-        return res.status(401).send('access denied');
-        }
-
+    //delete an existing note ..
+    const deletenote = await Notes.findByIdAndDelete(req.params.id);
+     console.log("delete sucessfully");
+    res.json(deletenote);
     } catch (error) {
-       return res.status(500).send('internal Server error:' + error.stack); 
+        return res.status(500).send('internal server Error:'+ error.stack);
     }
     
-    // Delete existing note 
-    const deletenote = await Notes.findByIdAndDelete(req.params.id);
-    console.log('Delete note sucessfully');
-    console.log(deletenote);
-})
-
-module.exports = router;
+}) 
+module.exports = router

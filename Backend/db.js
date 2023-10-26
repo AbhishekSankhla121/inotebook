@@ -1,13 +1,11 @@
 const mongoose = require('mongoose');
-const mongoURI = "mongodb://127.0.0.1:27017/inotebook";
-
-const connectToMongo = async () => {
+const mongooseURI = "mongodb://127.0.0.1:27017/practice"
+const connectTOMongo=()=>{
     try {
-        await mongoose.connect(mongoURI);
-        console.log("connected to mongo successfully");
-    } catch (err) {
-        console.error("Error connecting to mongo:", err.message);
+        mongoose.connect(mongooseURI)
+        console.log("connect to mogo sucessfully");
+    } catch (error) {
+        console.error("Error connecting to MongoDB:", error.message);
     }
-};
-
-module.exports = connectToMongo;
+}
+module.exports = connectTOMongo 
