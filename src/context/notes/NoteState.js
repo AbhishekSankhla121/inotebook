@@ -23,6 +23,33 @@ const Notestate =(props)=>{
             "tag": "persnal",
             "date": "2023-10-24T17:06:30.911Z",
             "__v": 0
+        },
+        {
+            "_id": "6537f9960508d4ae282b454a",
+            "user": "653579b359a64133e061a1fd",
+            "title": "this is an exmple ",
+            "description": "Kindly please ignoree it .",
+            "tag": "persnal",
+            "date": "2023-10-24T17:06:30.911Z",
+            "__v": 0
+        },
+        {
+            "_id": "6537f9960508d4ae282b455a",
+            "user": "653579b359a64133e061a1fd",
+            "title": "this is an exmple ",
+            "description": "Kindly please ignoree it .",
+            "tag": "persnal",
+            "date": "2023-10-24T17:06:30.911Z",
+            "__v": 0
+        },
+        {
+            "_id": "6537f9960508d4ae282b456a",
+            "user": "653579b359a64133e061a1fd",
+            "title": "this is an exmple ",
+            "description": "Kindly please ignoree it .",
+            "tag": "persnal",
+            "date": "2023-10-24T17:06:30.911Z",
+            "__v": 0
         }
     ];
 const [notes ,setnotes] = useState(notesInitial);
