@@ -66,7 +66,7 @@ routeer.post('/userlogin',[
   }
 
   const {email,password} = req.body;
-  
+  let success= false;
   try {
     const user =await  User.findOne({email});
     if(!user){  
@@ -83,14 +83,14 @@ routeer.post('/userlogin',[
       id: user.id
     }
   }
- 
+  success = true;
   const JWT_data = jwt.sign(data,JWT_secretKey);
-  res.json({JWT_data:JWT_data});
+  res.json({success,JWT_data});
   
     
   }catch (error) {
     console.error(error.message);
-    res.status(500).send("internal server error ");
+    res.status(500).send( success,error.message,"internal  error login routes");
   }
 
   

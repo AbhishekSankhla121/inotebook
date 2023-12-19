@@ -8,7 +8,6 @@ const {body,validationResult} = require('express-validator');
 router.get('/getuserdata',fetchuser,async(req,res)=>{
     try {
     const note = await Notes.find({user:req.user});
-    console.log(note);
     res.json(note);
     } catch (error) {
         console.log(error.stack);

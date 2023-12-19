@@ -9,6 +9,8 @@ import Alert from "./components/Alert";
 
 //import react dom.
 import {BrowserRouter, Route, Routes } from "react-router-dom";
+import Login from "./components/login";
+import Signup from "./components/signup";
 
 function App() {
   return (
@@ -21,10 +23,13 @@ function App() {
     <Routes>
     <Route  excat path="/" element={<Home></Home>}/>
     <Route excat path="/About" element ={<About></About>}/>
+    <Route excat path="/login" element ={<Login></Login>}/>
+    <Route excat path = "/signup" element={<Signup/>}/>
     </Routes>
     </div>
     </BrowserRouter>  
     </NoteState>
+    
     </>   
   );
 }
