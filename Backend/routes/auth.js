@@ -17,9 +17,10 @@ routeer.post('/createuser',[
 
 ],async(req,res)=>{
   // if there are errors , return bad request and the errors
+    let  success = false;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({ errors: errors.array() ,success});
       } 
 
   
@@ -27,7 +28,7 @@ routeer.post('/createuser',[
     // check wheater the user with this email exist already
     let user =await User.findOne({email: req.body.email})
     if(user){
-      return res.status(400).json({error: "sorry a user with this email is already exist"})
+      return res.status(400).json({error: "sorry a user with this email is already exist", success})
     }
        const salt = await bcrypt.genSalt(10);
        const securePassword = await bcrypt.hash(req.body.password,salt);
@@ -44,11 +45,13 @@ routeer.post('/createuser',[
       }
     }
     const JWT_data = jwt.sign(data,JWT_secretKey);
-    res.json({JWT_data:JWT_data});
+    success = true;
+    
+    res.json({JWT_data,success});
 
   } catch (error) {
     console.error(error.message);
-    res.status(500).send("Some Error is  Occured");
+    res.status(500).send("Some Error is  Occured", success);
   }  
 
 })   

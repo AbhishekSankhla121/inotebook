@@ -22,7 +22,7 @@ export default function Login(){
         }
         else{
           // /redirect
-          console.log("/exit")
+         alert("jaldi whaa se hatooooo")
         }
     
     }
