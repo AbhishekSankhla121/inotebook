@@ -1,29 +1,41 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
+import {useNavigate} from 'react-router-dom';
 import AddNote from './AddNote';
 import NoteItem from './NoteItem';
 import noteContext from '../context/notes/noteContext';
-export default function Notes () {
+export default function Notes (props) {
+  const navigation =  useNavigate();
   const ref= useRef(null);
   const refclose = useRef(null);
+
   const [note,setnote] = useState({id:"",etitle:"",edescription:"",etag:""})
-    const Context = useContext(noteContext);
-    const {notes,getNotes,editNote} = Context;
-    useEffect(() => {
-      getNotes()
+  const Context = useContext(noteContext);
+  const {notes,getNotes,editNote} = Context;
+  
+  useEffect(() => {
+    if(localStorage.token){
+      getNotes();
+    }
+    else{
+    navigation('/login')
+    }
     }, []);
+  
+  
     const updateNote = (currentnote)=>{
        ref.current.click()
        setnote({id:currentnote._id,etitle:currentnote.title,edescription: currentnote.description,etag:currentnote.tag})
     };
+  
     const handleClick =(e)=>{
       editNote(note.id,note.etitle,note.edescription,note.etag)
       refclose.current.click();
-     
 
   }
   const onChange =(e)=>{
     setnote({...note,[e.target.name]:e.target.value})
   }
+
   return (
     <>
   

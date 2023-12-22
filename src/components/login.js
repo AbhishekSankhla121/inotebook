@@ -1,7 +1,8 @@
 import React,{useState} from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Login(){
+export default function Login(props){
+  let {showalert} = props;
   let navigate = useNavigate();
     const host ="http://localhost:5000"
     const [credential,setcredential] = useState({email:"",password:""});
@@ -18,11 +19,11 @@ export default function Login(){
           // redirect
           localStorage.setItem("token",json.JWT_data);
           console.log(localStorage.token);
+          showalert("success","successfully logged in");
           navigate("/")
         }
         else{
-          // /redirect
-         alert("jaldi whaa se hatooooo")
+          showalert("danger","invalid credentials");
         }
     
     }
@@ -36,7 +37,7 @@ export default function Login(){
 
     return(<>
     <form onSubmit={handelChange}>
-  <div className="mb-3">
+  <div className="mb-3 my-5">
     <label htmlFor="exampleInputEmail1" className="form-label">Email address</label>
     <input type="email" className="form-control email" id="exampleInputEmail1" name="email" aria-describedby="emailHelp" onChange={onChange}/>
     <div id="emailHelp" className="form-text">We'll never share your email with anyone else.</div>

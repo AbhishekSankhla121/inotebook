@@ -19,7 +19,7 @@ const getNotes =async()=>{
       method: "GET", // *GET, POST, PUT, DELETE, etc.
       headers: {
         "Content-Type": "application/json",
-        "auth-token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjUzNTc5YjM1OWE2NDEzM2UwNjFhMWZkIn0sImlhdCI6MTY5ODAwMzM5MX0.bgoI32MTvkR0a7R24in8SUJoYtyizCCRjVKJ18o8g48"  
+        "auth-token": localStorage.token  
       },
     
     });
@@ -38,12 +38,13 @@ const addNote = async(title,description,tag)=>{
       method: "POST", // *GET, POST, PUT, DELETE, etc.
       headers: {
         "Content-Type": "application/json",
-        "auth-token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjUzNTc5YjM1OWE2NDEzM2UwNjFhMWZkIn0sImlhdCI6MTY5ODAwMzM5MX0.bgoI32MTvkR0a7R24in8SUJoYtyizCCRjVKJ18o8g48"  
+        "auth-token": localStorage.token  
       },
       body: JSON.stringify({title,description,tag}), // body data type must match "Content-Type" header
     });
     const note = await response.json();
     setnotes(notes.concat(note))
+    props.showalert("success","your note is added")
 };
 // delete a note 
 const deleteNote =async(id)=>{
@@ -52,7 +53,7 @@ const deleteNote =async(id)=>{
     method: "DELETE", // *GET, POST, PUT, DELETE, etc.
     headers: {
       "Content-Type": "application/json",
-      "auth-token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjUzNTc5YjM1OWE2NDEzM2UwNjFhMWZkIn0sImlhdCI6MTY5ODAwMzM5MX0.bgoI32MTvkR0a7R24in8SUJoYtyizCCRjVKJ18o8g48"  
+      "auth-token": localStorage.token  
     },
   });
   // eslint-disable-next-line
@@ -60,6 +61,7 @@ const deleteNote =async(id)=>{
   
     const newnotes = notes.filter((no)=>{return no._id !== id});
     setnotes(newnotes);
+    props.showalert("success","your note is deleted")
 };
 
 
@@ -73,7 +75,7 @@ const editNote = async(id,title,description,tag)=>{
           method: "PUT", // *GET, POST, PUT, DELETE, etc.
           headers: {
             "Content-Type": "application/json",
-            "auth-token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjUzNTc5YjM1OWE2NDEzM2UwNjFhMWZkIn0sImlhdCI6MTY5ODAwMzM5MX0.bgoI32MTvkR0a7R24in8SUJoYtyizCCRjVKJ18o8g48"  
+            "auth-token": localStorage.token  
           },
          
           body: JSON.stringify({title,description,tag}), // body data type must match "Content-Type" header
@@ -94,6 +96,7 @@ const editNote = async(id,title,description,tag)=>{
        
     }
     setnotes(updatedNewNote);
+    props.showalert("success","your note is updated")
 };
     return(
         <>
